@@ -1,6 +1,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Colors */
+  --color-primary: rgb(152, 176, 255);
+  --color-secondary: rgb(100, 150, 255);
+  --color-border: var(--color-primary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,4 +44,11 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+main {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

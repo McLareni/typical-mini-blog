@@ -1,0 +1,18 @@
+.post {
+  padding: 16px;
+  background: var(--color-primary);
+  border-radius: 8px;
+
+  text-align: center;
+  color: white;
+
+  max-width: 300px;
+}
+
+.tags {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

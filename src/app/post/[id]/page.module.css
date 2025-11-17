@@ -1,0 +1,23 @@
+.post {
+  max-width: 500px;
+  margin: 16px auto;
+  padding: 20px;
+
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.date {
+  font-size: 12px;
+}

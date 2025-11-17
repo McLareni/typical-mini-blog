@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
+
+import Header from "@/components/Header/Header";
+import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <Header />
+        <Suspense fallback={<LoadingSpinner />}>
+          <main>{children}</main>
+        </Suspense>
       </body>
     </html>
   );
