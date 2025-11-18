@@ -4,6 +4,8 @@ import { GET, DELETE } from "@/app/api/posts/[id]/route";
 import { POST } from "@/app/api/posts/route";
 import prisma from "@/lib/prisma";
 
+import { TEST_USER } from "../setup/globalSetup";
+
 describe("E2E: Posts API", () => {
   let createdPostId: number;
 
@@ -23,12 +25,16 @@ describe("E2E: Posts API", () => {
       title: "E2E Test Post",
       content: "Testing content",
       tags: ["Test"],
+      authorId: 1,
     };
 
     const postRes = await POST(
       new Request("http://localhost/api/posts", {
         method: "POST",
         body: JSON.stringify(newPost),
+        headers: {
+          Authorization: `Bearer ${TEST_USER.accessToken}`,
+        },
       })
     );
 

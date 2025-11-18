@@ -80,7 +80,6 @@ export async function PATCH(
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    // Prisma "record not found" error code
     if (error?.code === "P2025") {
       return new Response(JSON.stringify({ message: "Post not found" }), {
         status: 404,

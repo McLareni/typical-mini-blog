@@ -1,11 +1,8 @@
-/**
- * @jest-environment jsdom
- */
-
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import Form from "@/components/AddPostForm/AddPostForm";
+import { TEST_USER, TEST_USER_ID } from "@/tests/setup/globalSetup";
 
 const pushMock = jest.fn();
 const refreshMock = jest.fn();
@@ -17,10 +14,19 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
+jest.mock("@/context/userContext", () => ({
+  useUser: () => ({
+    user: { ...TEST_USER },
+  }),
+}));
+
 describe("Form API integration", () => {
   beforeEach(() => {
     global.fetch = jest.fn(() =>
-      Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 1 }) })
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ id: TEST_USER_ID }),
+      })
     ) as jest.Mock;
   });
 
@@ -44,11 +50,15 @@ describe("Form API integration", () => {
       "/api/posts",
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + TEST_USER.accessToken,
+        },
         body: JSON.stringify({
           title: "Test Post",
           content: "Test content",
           tags: [],
+          authorId: TEST_USER_ID,
         }),
       })
     );
@@ -68,8 +78,10 @@ describe("Form API integration", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       excerpt: "Old excerpt",
+      author: TEST_USER,
+      authorId: TEST_USER_ID,
     };
-    render(<Form defaultvalues={defaultValues} />);
+    render(<Form defaultValues={defaultValues} />);
 
     const titleInput = screen.getByLabelText(/title/i);
     const submitButton = screen.getByRole("button", { name: /edit post/i });
@@ -82,7 +94,10 @@ describe("Form API integration", () => {
       "/api/posts/1",
       expect.objectContaining({
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + TEST_USER.accessToken,
+        },
         body: JSON.stringify({
           title: "Updated Title",
           content: "Old content",

@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useUser } from "@/context/userContext";
 import { PostDetailDTO } from "@/types/post";
 import { POST_TAGS } from "@/utils/Constants/Post";
 import { validateNewPost } from "@/utils/validation/newPostValidation";
@@ -12,16 +13,17 @@ import FormTag from "../UI/FormTag/FormTag";
 import styles from "./AddPostform.module.css";
 
 interface IProps {
-  defaultvalues?: PostDetailDTO;
+  defaultValues?: PostDetailDTO;
 }
 
-export default function Form({ defaultvalues }: IProps) {
-  const [title, setTitle] = useState<string>(defaultvalues?.title || "");
-  const [content, setContent] = useState<string>(defaultvalues?.content || "");
-  const [tags, setTags] = useState<string[]>(defaultvalues?.tags || []);
+export default function Form({ defaultValues }: IProps) {
+  const [title, setTitle] = useState<string>(defaultValues?.title || "");
+  const [content, setContent] = useState<string>(defaultValues?.content || "");
+  const [tags, setTags] = useState<string[]>(defaultValues?.tags || []);
   const router = useRouter();
+  const { user } = useUser();
 
-  const isEdit = Boolean(defaultvalues);
+  const isEdit = Boolean(defaultValues);
 
   const addTag = (tag: string) => {
     if (!tags.includes(tag)) {
@@ -37,18 +39,20 @@ export default function Form({ defaultvalues }: IProps) {
 
     if (validation.valid) {
       try {
-        await fetch("/api/posts", {
+        const res = await fetch("/api/posts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.accessToken}`,
           },
-          body: JSON.stringify({ title, content, tags }),
+          body: JSON.stringify({ title, content, tags, authorId: user?.id }),
         });
-
-        router.refresh();
-        setTitle("");
-        setContent("");
-        setTags([]);
+        if (res.ok) {
+          router.refresh();
+          setTitle("");
+          setContent("");
+          setTags([]);
+        }
       } finally {
       }
     } else {
@@ -62,15 +66,16 @@ export default function Form({ defaultvalues }: IProps) {
 
     if (validation.valid) {
       try {
-        await fetch(`/api/posts/${defaultvalues?.id}`, {
+        await fetch(`/api/posts/${defaultValues?.id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.accessToken}`,
           },
           body: JSON.stringify({ title, content, tags }),
         });
 
-        router.push("/post/" + defaultvalues?.id);
+        router.push("/post/" + defaultValues?.id);
       } finally {
       }
     } else {

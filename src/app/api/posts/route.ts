@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { revalidatePath } from "next/cache";
 
 import prisma from "@/lib/prisma";
@@ -10,6 +11,15 @@ export async function GET() {
       title: true,
       excerpt: true,
       tags: true,
+      author: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
     },
   });
 
@@ -18,6 +28,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body: PostDetailDTO = await request.json();
+  const token = request.headers.get("Authorization")?.split(" ")[1];
+
+  const validUserId = jwt.verify(
+    token || "",
+    process.env.ACCESS_TOKEN_SECRET || ""
+  ) as { userId: number };
+
+  if (!validUserId || validUserId.userId !== body.authorId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   if (!body.title) {
     return Response.json({ error: "Invalid post data" }, { status: 400 });
@@ -25,6 +45,7 @@ export async function POST(request: Request) {
 
   const newPost = await prisma.post.create({
     data: {
+      authorId: body.authorId,
       title: body.title,
       content: body.content || null,
       excerpt: body.content?.slice(0, 30) || null,

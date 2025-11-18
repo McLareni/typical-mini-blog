@@ -1,6 +1,8 @@
 import { GET, POST } from "@/app/api/posts/route";
 import prisma from "@/lib/prisma";
 
+import { TEST_USER_ID, TEST_USER } from "../setup/globalSetup";
+
 describe("GET /api/posts", () => {
   it("returns a posts", async () => {
     const res = await GET();
@@ -23,11 +25,15 @@ describe("POST /api/posts", () => {
       title: "Test Post",
       content: "This is a test post content.",
       tags: ["Food"],
+      authorId: 1,
     };
     const res = await POST(
       new Request("http://localhost/api/posts", {
         method: "POST",
         body: JSON.stringify(newPost),
+        headers: {
+          Authorization: `Bearer ${TEST_USER.accessToken}`,
+        },
       })
     );
 
@@ -45,6 +51,7 @@ describe("POST /api/posts", () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         excerpt: expect.any(String),
+        authorId: expect.any(Number),
       })
     );
 

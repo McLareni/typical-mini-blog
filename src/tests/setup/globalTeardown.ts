@@ -5,5 +5,9 @@ export default async function globalTeardown() {
     where: { id: { in: [1, 2] } },
   });
 
+  await prisma.user.deleteMany({
+    where: { id: 1 },
+  });
+
   await prisma.$disconnect();
 }

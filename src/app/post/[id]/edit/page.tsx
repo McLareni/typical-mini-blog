@@ -17,5 +17,5 @@ export default async function Page({ params }: Props) {
 
   const post: PostDetailDTO = await res.json();
 
-  return <Form defaultvalues={post} />;
+  return <Form defaultValues={post} />;
 }

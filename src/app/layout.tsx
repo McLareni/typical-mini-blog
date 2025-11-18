@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Header from "@/components/Header/Header";
 import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
 import "./globals.css";
+import { UserProvider } from "@/context/userContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Header />
         <Suspense fallback={<LoadingSpinner />}>
-          <main>{children}</main>
+          <UserProvider>
+            <main>{children}</main>
+          </UserProvider>
         </Suspense>
       </body>
     </html>

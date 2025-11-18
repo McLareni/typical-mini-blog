@@ -12,7 +12,7 @@
 
 .form > button {
   padding: 4px 10px;
-    border-radius: 8px;
+  border-radius: 8px;
 }
 
 .inputs {
@@ -25,4 +25,14 @@
   display: flex;
   gap: 4px;
   flex-wrap: nowrap;
+}
+
+.toogles {
+  background: transparent;
+  border: none;
+}
+
+.toogles:hover {
+  cursor: pointer;
+  color: var(--color-primary);
 }

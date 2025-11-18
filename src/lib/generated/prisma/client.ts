@@ -29,8 +29,8 @@ export * from "./enums"
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Posts
- * const posts = await prisma.post.findMany()
+ * // Fetch zero or more Users
+ * const users = await prisma.user.findMany()
  * ```
  * 
  * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
@@ -40,10 +40,12 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 
-// file annotations for bundling tools to include these files
-path.join(__dirname, "query_engine-windows.dll.node")
-path.join(process.cwd(), "src/lib/generated/prisma/query_engine-windows.dll.node")
 
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
 /**
  * Model Post
  * 
