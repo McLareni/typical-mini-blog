@@ -1,30 +1,27 @@
 import PostActions from "@/components/PostActions/PostActions";
 import FormTag from "@/components/UI/FormTag/FormTag";
 import { PostDetailDTO } from "@/types/post";
+import { formatterDate } from "@/utils/function/formatterDate";
 
 import styles from "./page.module.css";
 
 const URL = process.env.NEXT_PUBLIC_URL;
 
 interface IProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }
 
 export default async function PostPage({ params }: IProps) {
   const { id } = await params;
-  console.log(id);
-
   const res = await fetch(`${URL}/api/posts/${id}`);
 
   if (!res.ok) {
     return <p>Post not found</p>;
   }
 
-  const { title, content, tags, updatedAt } =
+  const { title, content, tags, updatedAt, authorId } =
     (await res.json()) as PostDetailDTO;
-  const formattedDate = `${updatedAt.toString().slice(0, 10)} - ${updatedAt
-    .toString()
-    .slice(11, 16)}`;
+  const formattedDate = formatterDate("WITH_TIME", updatedAt);
 
   return (
     <div className={styles.post}>
@@ -41,7 +38,7 @@ export default async function PostPage({ params }: IProps) {
       {updatedAt && <p className={styles.date}>Date: {formattedDate}</p>}
 
       {/* client side */}
-      <PostActions />
+      <PostActions authorId={authorId || 0} />
     </div>
   );
 }

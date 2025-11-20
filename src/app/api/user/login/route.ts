@@ -11,7 +11,6 @@ export async function POST(request: Request) {
   const { password, login }: LoginDTO = await request.json();
 
   console.log({ password, login });
-  
 
   if (!login || !password) {
     return Response.json({ error: "Invalid post data" }, { status: 400 });
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
     expiresIn: "7d",
   });
 
-  const { id, email, name } = user;
+  const { id, email, name, createdAt } = user;
 
   const response = {
     id,
@@ -53,6 +52,7 @@ export async function POST(request: Request) {
     name,
     accessToken: access_token,
     refreshToken: refresh_token,
+    createdAt,
   };
 
   return Response.json(response, { status: 200 });

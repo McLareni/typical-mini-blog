@@ -1,9 +1,10 @@
 import { DELETE, GET, PATCH } from "@/app/api/posts/[id]/route";
+import { TEST_USER } from "@/tests/setup/globalSetup";
 
 describe("GET /api/posts/[id]", () => {
   it("returns a post", async () => {
     const res = await GET(new Request("http://localhost/api/posts/1"), {
-      params: Promise.resolve({ id: "1" }),
+      params: Promise.resolve({ id: 1 }),
     });
 
     expect(res.status).toBe(200);
@@ -28,8 +29,11 @@ describe("PATCH /api/posts/[id]", () => {
       new Request("http://localhost/api/posts/1", {
         method: "PATCH",
         body: JSON.stringify(updatedData),
+        headers: {
+          Authorization: `Bearer ${TEST_USER.accessToken}`,
+        },
       }),
-      { params: Promise.resolve({ id: "1" }) }
+      { params: Promise.resolve({ id: 1 }) }
     );
 
     expect(res.status).toBe(200);
@@ -45,12 +49,15 @@ describe("PATCH /api/posts/[id]", () => {
 });
 
 describe("DELETE /api/posts/[id]", () => {
-  it("deletes a post", async () => {
+  it("deleted a post", async () => {
     const res = await DELETE(
       new Request("http://localhost/api/posts/1", {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${TEST_USER.accessToken}`,
+        },
       }),
-      { params: Promise.resolve({ id: "1" }) }
+      { params: Promise.resolve({ id: 1 }) }
     );
 
     expect(res.status).toBe(200);
@@ -59,7 +66,7 @@ describe("DELETE /api/posts/[id]", () => {
     expect(data).toHaveProperty("message", "Post deleted");
 
     const getRes = await GET(new Request("http://localhost/api/posts/1"), {
-      params: Promise.resolve({ id: "1" }),
+      params: Promise.resolve({ id: 1 }),
     });
     expect(getRes.status).toBe(404);
   });

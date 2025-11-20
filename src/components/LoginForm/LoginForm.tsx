@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useUser } from "@/context/userContext";
 import {
@@ -15,16 +15,28 @@ import styles from "./LoginFrom.module.css";
 
 export default function Form() {
   const router = useRouter();
-  const { setUser } = useUser();
+  const { setUser, user, setUserLoaded } = useUser();
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [repassword, setRepassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
 
+  useEffect(() => {
+    if (user?.accessToken) {
+      router.push("/profile");
+    }
+  }, [user, router]);
+
+  if (user?.accessToken) {
+    return null;
+  }
+
   const loginFn = async (e: React.FocusEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const validation = validateLogin(login, password);
 
@@ -38,20 +50,25 @@ export default function Form() {
           body: JSON.stringify({ login, password }),
         });
         if (res.ok) {
-          alert("Login successful!");
           const user = await res.json();
           setUser(user);
-          router.push("/");
+          setUserLoaded(true);
+          router.push("/profile");
+          alert("Login successful!");
         }
       } finally {
       }
     } else {
       alert(`${validation.error}`);
     }
+
+    setIsLoading(false);
   };
 
   const registerFn = async (e: React.FocusEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     const validation = validateRegistration(login, password, name, repassword);
     if (validation.valid) {
@@ -73,6 +90,8 @@ export default function Form() {
     } else {
       alert(`${validation.error}`);
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -123,7 +142,9 @@ export default function Form() {
             />
           </div>
         )}
-        <button type="submit">{isLoginMode ? "Login" : "Registration"}</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoginMode ? "Login" : "Registration"}
+        </button>
       </form>
 
       <button

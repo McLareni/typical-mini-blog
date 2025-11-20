@@ -30,12 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Header />
-        <Suspense fallback={<LoadingSpinner />}>
-          <UserProvider>
+        <UserProvider>
+          <Header />
+          <Suspense fallback={<LoadingSpinner />}>
             <main>{children}</main>
-          </UserProvider>
-        </Suspense>
+          </Suspense>
+        </UserProvider>
       </body>
     </html>
   );

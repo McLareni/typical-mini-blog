@@ -14,9 +14,7 @@ describe("E2E: Posts API", () => {
       if (createdPostId) {
         await prisma.post.delete({ where: { id: createdPostId } });
       }
-    } catch {
-      console.log("Post already deleted");
-    }
+    } catch {}
     await prisma.$disconnect();
   });
 
@@ -51,7 +49,7 @@ describe("E2E: Posts API", () => {
     const getRes = await GET(
       new Request(`http://localhost/api/posts/${createdPostId}`),
       {
-        params: Promise.resolve({ id: String(createdPostId) }),
+        params: Promise.resolve({ id: createdPostId }),
       }
     );
 
@@ -67,8 +65,11 @@ describe("E2E: Posts API", () => {
     const deleteRes = await DELETE(
       new Request(`http://localhost/api/posts/${createdPostId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${TEST_USER.accessToken}`,
+        },
       }),
-      { params: Promise.resolve({ id: String(createdPostId) }) }
+      { params: Promise.resolve({ id: createdPostId }) }
     );
 
     expect(deleteRes.status).toBe(200);
@@ -78,7 +79,7 @@ describe("E2E: Posts API", () => {
     const getRes = await GET(
       new Request(`http://localhost/api/posts/${createdPostId}`),
       {
-        params: Promise.resolve({ id: String(createdPostId) }),
+        params: Promise.resolve({ id: createdPostId }),
       }
     );
 

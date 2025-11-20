@@ -7,9 +7,13 @@ import {
   TEST_USER_ID,
   TEST_USER_PASSWORD,
 } from "@/tests/setup/globalSetup";
+import { UserDTO } from "@/types/user";
 
 const pushMock = jest.fn();
 const refreshMock = jest.fn();
+
+const mockSetUser = jest.fn();
+let mockUser: UserDTO | null = null;
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -20,8 +24,10 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/context/userContext", () => ({
   useUser: () => ({
-    user: { ...TEST_USER },
-    setUser: jest.fn(),
+    user: mockUser,
+    setUser: mockSetUser,
+    userLoaded: true,
+    setUserLoaded: jest.fn(),
   }),
 }));
 
@@ -38,6 +44,7 @@ describe("Login Form", () => {
             name: TEST_USER.name,
             accessToken: TEST_USER.accessToken,
             refreshToken: TEST_USER.refreshToken,
+            createdAt: TEST_USER.refreshToken,
           }),
       })
     ) as jest.Mock;
@@ -45,6 +52,7 @@ describe("Login Form", () => {
 
   test("Login user", async () => {
     render(<Page />);
+    mockUser = null;
 
     const loginInput = screen.getByLabelText(/Login/i);
     const passwordInput = screen.getByLabelText(/Password/i);
@@ -69,7 +77,22 @@ describe("Login Form", () => {
       })
     );
 
+    expect(mockSetUser).toHaveBeenCalledWith({
+      id: TEST_USER_ID,
+      email: TEST_USER.email,
+      name: TEST_USER.name,
+      accessToken: TEST_USER.accessToken,
+      refreshToken: TEST_USER.refreshToken,
+      createdAt: TEST_USER.refreshToken,
+    });
     expect(window.alert).toHaveBeenCalled();
+    expect(pushMock).toHaveBeenCalled();
+  });
+
+  test("Login if you login", async () => {
+    mockUser = { ...TEST_USER };
+    render(<Page />);
+
     expect(pushMock).toHaveBeenCalled();
   });
 });
@@ -92,6 +115,7 @@ describe("Register Form", () => {
   };
 
   test("Registration user", async () => {
+    mockUser = null;
     render(<Page />);
 
     const changeModeButton = screen.getByRole("button", {

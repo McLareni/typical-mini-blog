@@ -1,11 +1,9 @@
-/**
- * @jest-environment jsdom
- */
-
 import { render, screen } from "@testing-library/react";
 
 import PostCard from "@/components/PostCard/PostCard";
 import { POST_TAGS } from "@/utils/Constants/Post";
+
+import { TEST_USER } from "../setup/globalSetup";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -21,6 +19,7 @@ describe("Form component", () => {
       title: "Sample Post",
       excerpt: "This is a sample post content.",
       tags: [POST_TAGS[0], POST_TAGS[1]],
+      author: TEST_USER,
     };
     render(<PostCard post={post} />);
 

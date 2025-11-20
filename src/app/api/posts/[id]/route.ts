@@ -1,9 +1,11 @@
 import prisma from "@/lib/prisma";
 import { PostDetailDTO } from "@/types/post";
+import { generateExcerpt } from "@/utils/function/generateValidExcerpt";
+import { userValidId } from "@/utils/validation/validUser";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: number }> }
 ) {
   const { id } = await params;
 
@@ -23,10 +25,20 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: number }> }
 ) {
   const { id } = await params;
   try {
+    const token = request.headers.get("Authorization")?.split(" ")[1];
+    const userId = userValidId(token);
+
+    const post = await prisma.post.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!userId || userId !== post?.authorId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const deletedPost = await prisma.post.delete({
       where: { id: Number(id) },
     });
@@ -55,9 +67,17 @@ export async function DELETE(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: number }> }
 ) {
   const { id } = await params;
+  const token = request.headers.get("Authorization")?.split(" ")[1];
+  const userId = userValidId(token);
+
+  const updatePost = await prisma.post.findFirst({ where: { id: +id } });
+
+  if (!userId || !updatePost || userId !== updatePost?.authorId) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   let body: PostDetailDTO;
   try {
@@ -72,7 +92,12 @@ export async function PATCH(
   try {
     const updated = await prisma.post.update({
       where: { id: Number(id) },
-      data: body,
+      data: {
+        title: body.title,
+        content: body.content,
+        tags: body.tags,
+        excerpt: generateExcerpt(body.content),
+      },
     });
 
     return new Response(JSON.stringify(updated), {

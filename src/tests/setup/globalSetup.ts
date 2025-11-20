@@ -13,6 +13,12 @@ const token = jwt.sign(
   { expiresIn: "1h" }
 );
 
+const refresh_token = jwt.sign(
+  { userId: TEST_USER_ID },
+  process.env.ACCESS_TOKEN_SECRET!,
+  { expiresIn: "7d" }
+);
+
 export const TEST_USER: UserDTO = {
   id: TEST_USER_ID,
   name: "testUser",
@@ -21,6 +27,7 @@ export const TEST_USER: UserDTO = {
   updatedAt: new Date(),
   Posts: [],
   accessToken: token,
+  refreshToken: refresh_token,
 };
 
 export default async function globalSetup() {
@@ -39,8 +46,13 @@ export default async function globalSetup() {
 
   await prisma.post.createMany({
     data: [
-      { id: 1, title: "Wand", content: "Magic wand", authorId: 1 },
-      { id: 2, title: "Broomstick", content: "Flying broom", authorId: 1 },
+      { id: 1, title: "Wand", content: "Magic wand", authorId: TEST_USER_ID },
+      {
+        id: 2,
+        title: "Broomstick",
+        content: "Flying broom",
+        authorId: TEST_USER_ID,
+      },
     ],
     skipDuplicates: true,
   });

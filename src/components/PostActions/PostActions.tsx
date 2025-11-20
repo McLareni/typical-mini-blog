@@ -3,11 +3,18 @@
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 
+import { useUser } from "@/context/userContext";
+
 import styles from "./PostActions.module.css";
 
-export default function PostActions() {
+interface IProps {
+  authorId: number;
+}
+
+export default function PostActions({ authorId }: IProps) {
   const router = useRouter();
   const params = useParams();
+  const { user } = useUser();
 
   const deletePost = async () => {
     const response = await fetch(`/api/posts/${params.id}`, {
@@ -18,6 +25,10 @@ export default function PostActions() {
       router.refresh();
     }
   };
+
+  if (authorId !== user?.id) {
+    return null;
+  }
 
   return (
     <div className={styles.buttons}>
