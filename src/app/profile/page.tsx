@@ -1,11 +1,10 @@
 import { UserInfo } from "@/components/UserInfo/UserInfo";
 import PrivateRoute from "@/route/PrivateRoute";
-export default function Page() {
-  console.log("profile");
 
+export default async function Page() {
   return (
     <PrivateRoute>
-      <UserInfo />
+      <UserInfo/>
     </PrivateRoute>
   );
 }

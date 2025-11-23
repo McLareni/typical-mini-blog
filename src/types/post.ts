@@ -10,7 +10,7 @@ export type PostListDTO = {
   id: number;
   title: string;
   excerpt: string | null;
-  tags: string[];
+  tags?: string[];
   author: PostAuthorDTO;
 };
 

@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 import { UserDTO } from "@/types/user";
 
@@ -19,8 +25,50 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserDTO | null>(null);
   const [userLoaded, setUserLoaded] = useState<boolean>(true);
 
+  const changeUser = (user: UserDTO | null) => {
+    if (user) {
+      setUser({ ...user });
+      localStorage.setItem("token", user?.accessToken || "");
+    } else {
+      setUser(null);
+      localStorage.removeItem("token");
+    }
+  };
+
+  useEffect(() => {
+    const getUser = async (token: string) => {
+      setUserLoaded(false);
+      const response = await fetch(`/api/user/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+
+        setUser({ ...user });
+      }
+
+      setUserLoaded(true);
+    };
+
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        getUser(token);
+      } else {
+        localStorage.removeItem("token");
+      }
+    }
+  }, []);
+
   return (
-    <UserContext.Provider value={{ user, setUser, userLoaded, setUserLoaded }}>
+    <UserContext.Provider
+      value={{ user, setUser: changeUser, userLoaded, setUserLoaded }}
+    >
       {children}
     </UserContext.Provider>
   );

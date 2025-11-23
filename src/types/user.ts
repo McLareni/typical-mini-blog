@@ -6,7 +6,7 @@ export type UserDTO = {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-  Posts: PostDetailDTO[];
+  posts: PostDetailDTO[];
   accessToken?: string;
   refreshToken?: string;
 };

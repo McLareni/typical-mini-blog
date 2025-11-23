@@ -13,9 +13,8 @@ export default function PostCard({ post }: { post: PostListDTO }) {
         <h1>{post.title}</h1>
         <p>{post.excerpt}</p>
         <div className={styles.tags}>
-          {post.tags.map((tag) => (
-            <FormTag key={tag} tag={tag} active />
-          ))}
+          {post.tags &&
+            post.tags.map((tag) => <FormTag key={tag} tag={tag} active />)}
         </div>
       </Link>
     </div>
